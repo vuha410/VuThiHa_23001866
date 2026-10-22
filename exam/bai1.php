@@ -2,6 +2,11 @@
     $name="Vũ Thị Hà";
     $score= 10;
 
+    if (!is_numeric($score) || $score < 0 || $score > 10) {
+        echo "Điểm số không hợp lệ.";
+        exit;
+    }
+
     if ($score >= 8) {
         $rank= "Giỏi";
     } elseif ($score >= 6.5 & $score < 8) {
