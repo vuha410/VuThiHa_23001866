@@ -1,6 +1,6 @@
 <?php
-    $name="Nguyễn Văn A";
-    $score= 9;
+    $name="Vũ Thị Hà";
+    $score= 10;
 
     if ($score >= 8) {
         $rank= "Giỏi";
