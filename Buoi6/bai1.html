@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thẻ thông tin sinh viên</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        body {
+        font-family: "Times New Roman", Times, serif;
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        padding: 40px 15px;
+        }
+
+        .student-card {
+            width: 350px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        .info {
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        .good {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .fair {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .average {
+            color: #fd7e14;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .studying {
+            color: green;
+            font-weight: bold;
+        }
+
+        .stopped {
+            color: red;
+            font-weight: bold;
+        }
+
+        button {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #084298;
+        }
+
+        .introduction {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="student-card">
+            <img
+                :src="student.avatar"
+                :alt="student.name"
+                class="avatar"
+            >
+
+            <h2>{{ student.name }}</h2>
+
+            <div class="info">
+                <p><strong>Mã sinh viên:</strong> {{ student.id }}</p>
+
+                <p>
+                    <strong>Lớp:</strong>
+                    <span v-text="student.className"></span>
+                </p>
+
+                <p><strong>Điểm trung bình:</strong> {{ student.gpa }}</p>
+
+                <p>
+                    <strong>Xếp loại:</strong>
+
+                    <span v-if="student.gpa < 0 || student.gpa > 10" 
+                        class="fail">
+                        Điểm không hợp lệ
+                    </span>
+
+                    <span v-else-if="student.gpa >= 8"
+                          :class="'good'">
+                        Giỏi
+                    </span>
+
+                    <span v-else-if="student.gpa >= 6.5"
+                          :class="'fair'">
+                        Khá
+                    </span>
+
+                    <span v-else-if="student.gpa >= 5"
+                          :class="'average'">
+                        Trung bình
+                    </span>
+
+                    <span v-else :class="'fail'">
+                        Chưa đạt
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Trạng thái:</strong>
+                    <span v-if="student.isStudying" class="studying">
+                        Đang học
+                    </span>
+                    <span v-else class="stopped">
+                        Đã nghỉ
+                    </span>
+                </p>
+            </div>
+
+            <button @click="showIntroduction = !showIntroduction">
+                {{ showIntroduction ? 'Ẩn giới thiệu' : 'Xem giới thiệu' }}
+            </button>
+
+            <div v-show="showIntroduction" class="introduction">
+                <strong>Giới thiệu:</strong>
+                <p>{{ student.introduction }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    student: {
+                        id: "23001866",
+                        name: "Vũ Thị Hà",
+                        className: "MAT3542-1",
+                        avatar: "https://cellphones.com.vn/sforum/wp-content/uploads/2024/01/anh-meme-36.jpg",
+                        gpa: 10,
+                        isStudying: true,
+                        introduction: "Tôi là sinh viên trường Đại học Khoa học Tự nhiên, ĐHQG HN."
+                    },
+                    showIntroduction: false
+                };
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

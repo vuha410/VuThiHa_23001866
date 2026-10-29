@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý công việc cá nhân</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: "Times New Roman", Times, serif;
+            background: #f0f2f5;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        .header p {
+            color: #77818b;
+            font-size: 17px;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .add-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 13px;
+            border: 1px solid #ced4da;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 17px;
+        }
+
+        .add-form input:focus {
+            outline: 2px solid #80bdff;
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 11px 17px;
+            border: none;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-add {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-add:hover {
+            background: #0056b3;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            padding: 16px 10px;
+            border-radius: 9px;
+            text-align: center;
+            background: #f1f5f9;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            display: block;
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-bottom: 18px;
+        }
+
+        .filter-btn {
+            background: #edf0f4;
+            color: #45515e;
+        }
+
+        .filter-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-checkbox {
+            width: 19px;
+            height: 19px;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: #198754;
+        }
+
+        .task-name {
+            flex: 1;
+            min-width: 0;
+            font-size: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #929ba5;
+        }
+
+        .btn-delete {
+            background: #ffe5e5;
+            color: #dc3545;
+            padding: 8px 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #7b8794;
+            background: #f8fafc;
+            border-radius: 10px;
+            line-height: 1.7;
+            font-size: 17px;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .remaining {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-clear:hover:not(:disabled) {
+            background: #b02a37;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            color: #dc3545;
+            font-size: 16px;
+        }
+
+        @media (max-width: 520px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .add-form {
+                flex-direction: column;
+            }
+
+            .stats {
+                gap: 7px;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .task-item {
+                gap: 8px;
+                padding: 13px 5px;
+            }
+
+            .task-name {
+                font-size: 16px;
+            }
+
+            .btn-delete {
+                padding: 7px 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+
+            <!-- TIÊU ĐỀ -->
+            <div class="header">
+                <h1>📋 Công Việc Cá Nhân</h1>
+                <p>Lên kế hoạch hôm nay, hoàn thành mục tiêu của bạn!</p>
+            </div>
+
+            <!-- 1, 2, 3. NHẬP VÀ THÊM CÔNG VIỆC -->
+            <form class="add-form" @submit.prevent="addTask">
+                <input
+                    type="text"
+                    v-model.trim="newTask"
+                    placeholder="Nhập công việc cần làm..."
+                    aria-label="Tên công việc mới"
+                >
+
+                <button type="submit" class="btn-add">
+                    + Thêm
+                </button>
+            </form>
+
+            <p v-if="errorMessage" class="message" role="alert">
+                {{ errorMessage }}
+            </p>
+
+            <!-- 8. THỐNG KÊ BẰNG COMPUTED -->
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-number">{{ totalTasks }}</span>
+                    <span class="stat-label">Tổng công việc</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-number">{{ remainingTasks }}</span>
+                    <span class="stat-label">Chưa hoàn thành</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-number">{{ completedTasks }}</span>
+                    <span class="stat-label">Đã hoàn thành</span>
+                </div>
+            </div>
+
+            <!-- 7. LỌC CÔNG VIỆC -->
+            <div class="filters">
+                <button
+                    type="button"
+                    class="filter-btn"
+                    :class="{ active: currentFilter === 'all' }"
+                    @click="currentFilter = 'all'"
+                >
+                    Tất cả
+                </button>
+
+                <button
+                    type="button"
+                    class="filter-btn"
+                    :class="{ active: currentFilter === 'active' }"
+                    @click="currentFilter = 'active'"
+                >
+                    Chưa hoàn thành
+                </button>
+
+                <button
+                    type="button"
+                    class="filter-btn"
+                    :class="{ active: currentFilter === 'completed' }"
+                    @click="currentFilter = 'completed'"
+                >
+                    Đã hoàn thành
+                </button>
+            </div>
+
+            <!-- 4, 5, 6, 10. DANH SÁCH CÔNG VIỆC -->
+            <ul v-if="filteredTasks.length > 0" class="task-list">
+                <li
+                    v-for="task in filteredTasks"
+                    :key="task.id"
+                    class="task-item"
+                >
+                    <input
+                        type="checkbox"
+                        class="task-checkbox"
+                        v-model="task.completed"
+                        :aria-label="'Hoàn thành ' + task.name"
+                    >
+
+                    <span
+                        class="task-name"
+                        :class="{ completed: task.completed }"
+                    >
+                        {{ task.name }}
+                    </span>
+
+                    <button
+                        type="button"
+                        class="btn-delete"
+                        @click="deleteTask(task.id)"
+                        :aria-label="'Xóa ' + task.name"
+                    >
+                        Xóa
+                    </button>
+                </li>
+            </ul>
+
+            <!-- THÔNG BÁO KHI DANH SÁCH RỖNG -->
+            <div v-else class="empty">
+                <div style="font-size: 35px;">📝</div>
+
+                <template v-if="tasks.length === 0">
+                    <strong>Chưa có công việc nào!</strong>
+                    <br>
+                    Hãy thêm công việc đầu tiên của bạn.
+                </template>
+
+                <template v-else-if="currentFilter === 'active'">
+                    <strong>Không có việc chưa hoàn thành.</strong>
+                    <br>
+                    Bạn đã hoàn thành tất cả công việc!
+                </template>
+
+                <template v-else>
+                    <strong>Chưa có công việc hoàn thành.</strong>
+                    <br>
+                    Hãy đánh dấu checkbox khi hoàn thành công việc.
+                </template>
+            </div>
+
+            <!-- 9. XÓA CÁC VIỆC ĐÃ HOÀN THÀNH -->
+            <div class="footer-actions">
+                <span class="remaining">
+                    Còn {{ remainingTasks }} công việc cần thực hiện
+                </span>
+
+                <button
+                    type="button"
+                    class="btn-clear"
+                    @click="clearCompleted"
+                    :disabled="completedTasks === 0"
+                >
+                    Xóa việc đã hoàn thành
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    newTask: "",
+                    errorMessage: "",
+                    currentFilter: "all",
+                    nextId: 4,
+
+                    tasks: [
+                        {
+                            id: 1,
+                            name: "Ôn tập bài Vue.js",
+                            completed: false
+                        },
+                        {
+                            id: 2,
+                            name: "Hoàn thành bài tập thực hành",
+                            completed: false
+                        },
+                        {
+                            id: 3,
+                            name: "Đọc tài liệu môn học",
+                            completed: true
+                        }
+                    ]
+                };
+            },
+
+            computed: {
+                // Tổng số công việc
+                totalTasks() {
+                    return this.tasks.length;
+                },
+
+                // Số công việc chưa hoàn thành
+                remainingTasks() {
+                    return this.tasks.filter(
+                        task => !task.completed
+                    ).length;
+                },
+
+                // Số công việc đã hoàn thành
+                completedTasks() {
+                    return this.tasks.filter(
+                        task => task.completed
+                    ).length;
+                },
+
+                // Danh sách sau khi lọc
+                filteredTasks() {
+                    if (this.currentFilter === "active") {
+                        return this.tasks.filter(
+                            task => !task.completed
+                        );
+                    }
+
+                    if (this.currentFilter === "completed") {
+                        return this.tasks.filter(
+                            task => task.completed
+                        );
+                    }
+
+                    return this.tasks;
+                }
+            },
+
+            methods: {
+                // Thêm công việc
+                addTask() {
+                    const name = this.newTask.trim();
+
+                    if (name === "") {
+                        this.errorMessage =
+                            "Vui lòng nhập tên công việc!";
+                        return;
+                    }
+
+                    this.tasks.push({
+                        id: this.nextId++,
+                        name: name,
+                        completed: false
+                    });
+
+                    this.newTask = "";
+                    this.errorMessage = "";
+                },
+
+                // Xóa một công việc theo ID
+                deleteTask(id) {
+                    this.tasks = this.tasks.filter(
+                        task => task.id !== id
+                    );
+                },
+
+                // Xóa toàn bộ công việc đã hoàn thành
+                clearCompleted() {
+                    this.tasks = this.tasks.filter(
+                        task => !task.completed
+                    );
+                }
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

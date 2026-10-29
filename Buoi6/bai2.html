@@ -1,0 +1,762 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt vé xem phim - Cinema+</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Times New Roman", Times, serif;
+            background: #11131b;
+            color: #f5f5f5;
+        }
+
+        header {
+            background: #191c28;
+            padding: 20px 7%;
+            border-bottom: 2px solid #e50914;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff3b45;
+        }
+
+        .header-text {
+            color: #ddd;
+            font-size: 17px;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .movie-banner {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 28px;
+            background: #1c2030;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+        .poster {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #303545;
+        }
+
+        .movie-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e50914;
+            padding: 6px 12px;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin: 15px 0 10px;
+        }
+
+        .movie-meta {
+            color: #c7cad4;
+            line-height: 1.9;
+            font-size: 17px;
+        }
+
+        .description {
+            line-height: 1.7;
+            color: #e1e1e1;
+            font-size: 17px;
+        }
+
+        .booking-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 22px;
+            margin-top: 25px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #1c2030;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a4052;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group > label,
+        .field-title {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #454b60;
+            border-radius: 7px;
+            background: #111522;
+            color: white;
+            font-family: inherit;
+            font-size: 17px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: 2px solid #e50914;
+        }
+
+        .radio-list {
+            display: flex;
+            gap: 12px;
+        }
+
+        .radio-card {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid #454b60;
+            border-radius: 8px;
+            cursor: pointer;
+            line-height: 1.8;
+        }
+
+        .radio-card:has(input:checked) {
+            border-color: #e50914;
+            background: #35202a;
+        }
+
+        .radio-card input,
+        .combo-card input {
+            accent-color: #e50914;
+        }
+
+        .quantity-control {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quantity-control input {
+            flex: 1;
+            min-width: 0;
+            text-align: center;
+        }
+
+        button {
+            font-family: inherit;
+            font-size: 17px;
+            border: none;
+            border-radius: 7px;
+            padding: 11px 15px;
+            cursor: pointer;
+        }
+
+        .quantity-control button {
+            width: 46px;
+            background: #353b50;
+            color: white;
+            font-size: 22px;
+        }
+
+        .combo-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid #454b60;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .combo-card input {
+            width: 19px;
+            height: 19px;
+        }
+
+        .combo-price {
+            color: #ffb84d;
+            margin-top: 5px;
+        }
+
+        .error {
+            color: #ff7078;
+            font-size: 15px;
+            margin-bottom: 0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 16px 0;
+            color: #d5d7df;
+            line-height: 1.5;
+        }
+
+        .summary-row span:last-child {
+            text-align: right;
+        }
+
+        .total {
+            border-top: 1px solid #454b60;
+            padding-top: 18px;
+            margin-top: 20px;
+        }
+
+        .total-label {
+            color: #ddd;
+            font-size: 18px;
+        }
+
+        .total-price {
+            color: #ffb84d;
+            font-size: 27px;
+            font-weight: bold;
+            margin-top: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .btn-book {
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+            background: #e50914;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-book:disabled {
+            background: #555;
+            color: #bbb;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            width: 100%;
+            margin-top: 10px;
+            background: #353b50;
+            color: white;
+        }
+
+        .notice {
+            color: #b9bdca;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .confirmation {
+            margin-top: 25px;
+            padding: 22px;
+            border: 1px solid #35b879;
+            background: #172d28;
+            border-radius: 12px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .confirmation h2 {
+            color: #62e6a5;
+        }
+
+        footer {
+            text-align: center;
+            color: #999;
+            padding: 25px;
+            margin-top: 30px;
+            border-top: 1px solid #292d3a;
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 18px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .movie-banner {
+                grid-template-columns: 1fr;
+            }
+
+            .poster {
+                max-width: 250px;
+                margin: auto;
+            }
+
+            .booking-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .radio-list {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">CINEMA+</div>
+            <div class="header-text">Đặt vé xem phim trực tuyến</div>
+        </header>
+
+        <main class="container">
+
+            <!-- THÔNG TIN VÀ LỰA CHỌN PHIM -->
+            <section class="movie-banner">
+                <img
+                    class="poster"
+                    :src="movie.poster"
+                    :alt="'Poster phim ' + movie.name"
+                >
+
+                <div class="movie-info">
+                    <label for="movieSelect" class="field-title">
+                        🎬 Chọn phim
+                    </label>
+
+                    <select id="movieSelect" v-model="selectedMovieId">
+                        <option
+                            v-for="item in movies"
+                            :key="item.id"
+                            :value="item.id"
+                        >
+                            {{ item.name }}
+                        </option>
+                    </select>
+
+                    <span class="tag" style="margin-top: 18px">
+                        {{ movie.rating }}
+                    </span>
+
+                    <h1>{{ movie.name }}</h1>
+
+                    <div class="movie-meta">
+                        <div><strong>Thể loại:</strong> {{ movie.genre }}</div>
+                        <div><strong>Thời lượng:</strong> {{ movie.duration }}</div>
+                        <div><strong>Đạo diễn:</strong> {{ movie.director }}</div>
+                    </div>
+
+                    <p class="description">{{ movie.description }}</p>
+                </div>
+            </section>
+
+            <!-- FORM ĐẶT VÉ -->
+            <div class="booking-layout">
+                <section class="panel">
+                    <h2>🎟️ Thông tin đặt vé</h2>
+
+                    <form @submit.prevent="bookTicket">
+
+                        <!-- 1. HỌ TÊN: v-model.trim -->
+                        <div class="form-group">
+                            <label for="customerName">
+                                Họ tên khách hàng
+                            </label>
+
+                            <input
+                                id="customerName"
+                                type="text"
+                                v-model.trim="customerName"
+                                placeholder="Nhập họ tên của bạn"
+                                required
+                            >
+                        </div>
+
+                        <!-- 2. CHỌN SUẤT CHIẾU -->
+                        <div class="form-group">
+                            <label for="showtime">Suất chiếu</label>
+
+                            <select id="showtime" v-model="showtime">
+                                <option value="09:00">09:00</option>
+                                <option value="13:30">13:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="19:00">19:00</option>
+                                <option value="21:30">21:30</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. CHỌN LOẠI VÉ -->
+                        <div class="form-group">
+                            <span class="field-title">Loại vé</span>
+
+                            <div class="radio-list">
+                                <label class="radio-card">
+                                    <input
+                                        type="radio"
+                                        v-model="ticketType"
+                                        value="regular"
+                                    >
+                                    Vé thường
+                                    <br>
+                                    <strong>70.000 đồng</strong>
+                                </label>
+
+                                <label class="radio-card">
+                                    <input
+                                        type="radio"
+                                        v-model="ticketType"
+                                        value="vip"
+                                    >
+                                    Vé VIP
+                                    <br>
+                                    <strong>100.000 đồng</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 4. SỐ LƯỢNG VÉ: v-model.number -->
+                        <div class="form-group">
+                            <label for="quantity">
+                                Số lượng vé (1–10)
+                            </label>
+
+                            <div class="quantity-control">
+                                <button
+                                    type="button"
+                                    @click="decreaseQuantity"
+                                    aria-label="Giảm số lượng"
+                                >−</button>
+
+                                <input
+                                    id="quantity"
+                                    type="number"
+                                    v-model.number="quantity"
+                                    min="1"
+                                    max="10"
+                                    step="1"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    @click="increaseQuantity"
+                                    aria-label="Tăng số lượng"
+                                >+</button>
+                            </div>
+
+                            <p v-if="!isQuantityValid" class="error">
+                                Số lượng phải là số nguyên từ 1 đến 10.
+                            </p>
+                        </div>
+
+                        <!-- 5. COMBO -->
+                        <div class="form-group">
+                            <span class="field-title">
+                                Đồ ăn và thức uống
+                            </span>
+
+                            <label class="combo-card">
+                                <input
+                                    type="checkbox"
+                                    v-model="combo"
+                                >
+
+                                <span>
+                                    <strong>🍿 Combo bắp nước</strong>
+                                    <br>
+                                    <span class="combo-price">
+                                        +45.000 đồng / đơn
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- 8. NÚT ĐẶT VÉ -->
+                        <button
+                            type="submit"
+                            class="btn-book"
+                            :disabled="!canBook"
+                        >
+                            ĐẶT VÉ NGAY
+                        </button>
+
+                        <!-- 7. ĐẶT LẠI FORM -->
+                        <button
+                            type="button"
+                            class="btn-reset"
+                            @click="resetForm"
+                        >
+                            Đặt lại thông tin
+                        </button>
+                    </form>
+                </section>
+
+                <!-- 6. TÍNH TIỀN BẰNG COMPUTED -->
+                <aside class="panel">
+                    <h2>Xác nhận lại đơn hàng</h2>
+
+                    <div class="summary-row">
+                        <span>Phim</span>
+                        <strong>{{ movie.name }}</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Suất chiếu</span>
+                        <strong>{{ showtime }}</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Loại vé</span>
+                        <strong>
+                            {{ ticketType === "vip" ? "VIP" : "Thường" }}
+                        </strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Giá một vé</span>
+                        <strong>{{ formatMoney(ticketPrice) }}</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Số lượng</span>
+                        <strong>
+                            {{ isQuantityValid ? quantity : "Không hợp lệ" }}
+                        </strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Tiền vé</span>
+                        <strong>{{ formatMoney(ticketSubtotal) }}</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Tiền combo</span>
+                        <strong>
+                            {{ formatMoney(combo ? 45000 : 0) }}
+                        </strong>
+                    </div>
+
+                    <div class="total">
+                        <div class="total-label">Tổng thanh toán</div>
+                        <div class="total-price">
+                            {{ formatMoney(totalPrice) }}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- 9. HIỂN THỊ XÁC NHẬN ĐẶT VÉ -->
+            <section v-if="booking" class="confirmation">
+                <h2>✓ Đặt vé thành công!</h2>
+
+                <p><strong>Mã đơn:</strong> {{ booking.code }}</p>
+                <p><strong>Khách hàng:</strong> {{ booking.name }}</p>
+                <p><strong>Tên phim:</strong> {{ booking.movie }}</p>
+                <p><strong>Suất chiếu:</strong> {{ booking.showtime }}</p>
+                <p><strong>Loại vé:</strong> {{ booking.ticketType }}</p>
+                <p><strong>Số lượng:</strong> {{ booking.quantity }} vé</p>
+                <p><strong>Combo bắp nước:</strong> {{ booking.combo }}</p>
+                <p>
+                    <strong>Tổng tiền:</strong>
+                    {{ formatMoney(booking.total) }}
+                </p>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    // DANH SÁCH PHIM
+                    movies: [
+                        {
+                            id: 1,
+                            name: "Chị Chị Em Em 3",
+                            genre: "Tâm lý, Tình cảm",
+                            duration: "122 phút",
+                            director: "Nguyễn Hữu Hoàng",
+                            rating: "T18",
+                            description:
+                                "Giữa xã hội Bắc Bộ cũ đầy lễ giáo và những khuôn phép khắt khe, Thị Mầu – tiểu thư nổi tiếng tài sắc nhất vùng – bước vào một thế giới nơi tình yêu chưa bao giờ là chuyện của riêng hai người. Những rung động bị che giấu, những mối quan hệ chồng chéo và những lựa chọn trái với khuôn phép dần tạo nên một mạng nhện tình cảm rối ren, nơi mỗi người đều có một bí mật, một toan tính và một người không thể gọi tên. Khi tình yêu và danh dự không thể cùng tồn tại, liệu ai sẽ là người thoát khỏi mạng nhện ấy – và ai sẽ phải trả giá cho thứ tình cảm mình không thể cưỡng lại?",
+                            poster:
+                                "https://files.betacorp.vn/media%2fimages%2f2026%2f10%2f08%2f400x633%2D101304%2D081026%2D10.jpg"
+                        },
+                        {
+                            id: 2,
+                            name: "Án Mạng Karaoke",
+                            genre: "Trinh thám, Hài hước",
+                            duration: "96 phút",
+                            director: "Hoàng Lê",
+                            rating: "T16",
+                            description:
+                                "Một người hàng xóm mê hát karaoke bất ngờ bị sát hại trong căn homestay thiền biệt lập trên núi, khiến chuyến hành hương của một xóm nhỏ bị biến thành trò chơi đầu trí bất đắc dĩ.",
+                            poster:
+                                "https://files.betacorp.vn/media%2fimages%2f2026%2f10%2f19%2f261026%2Dan%2Dmang%2Dkaraoke%2D154426%2D191026%2D19.jpg"
+                        },
+                        {
+                            id: 3,
+                            name: "Trại Buôn Người",
+                            genre: "Hành động, Tâm lý",
+                            duration: "135 phút",
+                            director: "Toni Dương Bảo Anh",
+                            rating: "T18",
+                            description:
+                                "Vì cứu em gái sa bẫy buôn người ở biên giới miền Tây, Ny (Steven Nguyễn) cùng bạn thân bị bắt làm nô dịch trong sào huyệt lừa đảo tàn bạo. Tại đây, họ cùng các trinh sát nằm vùng và các nạn nhân hứng chịu bi kịch thể xác âm thầm lập kế hoạch trốn thoát.",
+                            poster:
+                                "https://files.betacorp.vn/media%2fimages%2f2026%2f09%2f15%2fofficial%2Dposter%2Dtrai%2Dbuon%2Dnguoi%2Dfinal%2D142318%2D150926%2D62.jpg"
+                        },
+                        {
+                            id: 4,
+                            name: "Shaun The Sheep: Quái Lạ Ghé Nhà",
+                            genre: "Hoạt hình",
+                            duration: "81 phút",
+                            director: "Steve Cox, Matthew Walker",
+                            rating: "P",
+                            description:
+                                "SHAUN THE SHEEP: QUÁI LẠ GHÉ NHÀ bắt đầu với sự cố Ông chủ vô tình phá hỏng vườn bí ngô mà đàn cừu đang chuẩn bị cho Halloween. Để cứu vãn tình hình, Shaun trổ tài làm “nhà khoa học”, nhưng thí nghiệm lại kéo theo hàng loạt rắc rối ngoài dự tính. Khi Ông chủ mất tích và một sinh vật bí ẩn xuất hiện trong rừng, cả đàn cừu lên đường tìm kiếm Ông chủ và đối mặt với một chuyến phiêu lưu vừa quái vừa nhộn.",
+                            poster:
+                                "https://files.betacorp.vn/media%2fimages%2f2026%2f10%2f05%2f161026%2Dshaun%2Dthe%2Dsheep%2D152403%2D051026%2D14.jpg"
+                        }
+                    ],
+
+                    selectedMovieId: 1,
+                    customerName: "",
+                    showtime: "19:00",
+                    ticketType: "regular",
+                    quantity: 1,
+                    combo: false,
+                    booking: null
+                };
+            },
+
+            computed: {
+                // Phim đang được chọn
+                movie() {
+                    return this.movies.find(
+                        item => item.id === this.selectedMovieId
+                    ) || this.movies[0];
+                },
+
+                // Giá của một vé
+                ticketPrice() {
+                    return this.ticketType === "vip" ? 100000 : 70000;
+                },
+
+                // Kiểm tra số lượng hợp lệ
+                isQuantityValid() {
+                    return Number.isInteger(this.quantity)
+                        && this.quantity >= 1
+                        && this.quantity <= 10;
+                },
+
+                // Điều kiện bật nút đặt vé
+                canBook() {
+                    return this.customerName.trim() !== ""
+                        && this.isQuantityValid;
+                },
+
+                // Thành tiền vé
+                ticketSubtotal() {
+                    if (!this.isQuantityValid) return 0;
+                    return this.ticketPrice * this.quantity;
+                },
+
+                // Tổng tiền vé và combo
+                totalPrice() {
+                    return this.ticketSubtotal
+                        + (this.combo ? 45000 : 0);
+                }
+            },
+
+            methods: {
+                // Tăng số lượng, tối đa 10
+                increaseQuantity() {
+                    if (!this.isQuantityValid) {
+                        this.quantity = 1;
+                    } else if (this.quantity < 10) {
+                        this.quantity++;
+                    }
+                },
+
+                // Giảm số lượng, tối thiểu 1
+                decreaseQuantity() {
+                    if (!this.isQuantityValid) {
+                        this.quantity = 1;
+                    } else if (this.quantity > 1) {
+                        this.quantity--;
+                    }
+                },
+
+                // Định dạng tiền Việt Nam
+                formatMoney(amount) {
+                    return new Intl.NumberFormat("vi-VN").format(amount)
+                        + " đồng";
+                },
+
+                // Xác nhận đặt vé
+                bookTicket() {
+                    if (!this.canBook) return;
+
+                    this.booking = {
+                        code: "CIN" + Date.now().toString().slice(-8),
+                        name: this.customerName,
+                        movie: this.movie.name,
+                        showtime: this.showtime,
+                        ticketType: this.ticketType === "vip"
+                            ? "VIP"
+                            : "Vé thường",
+                        quantity: this.quantity,
+                        combo: this.combo ? "Có" : "Không",
+                        total: this.totalPrice
+                    };
+                },
+
+                // Khôi phục form
+                resetForm() {
+                    this.selectedMovieId = 1;
+                    this.customerName = "";
+                    this.showtime = "19:00";
+                    this.ticketType = "regular";
+                    this.quantity = 1;
+                    this.combo = false;
+                    this.booking = null;
+                }
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
