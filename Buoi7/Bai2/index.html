@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh mục sản phẩm</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <h2>DANH MỤC SẢN PHẨM</h2>
+
+        <div class="product-list">
+            <the-san-pham
+                v-for="product in products"
+                :key="product.id"
+                :ten="product.ten"
+                :gia="product.gia"
+                :anh="product.anh"
+                :mo-ta="product.moTa"
+                :so-luong-ton="product.soLuongTon"
+            ></the-san-pham>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="components/TheSanPham.js"></script>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    products: [
+                        {
+                            id: 1,
+                            ten: "iPhone 18 Pro 256GB",
+                            gia: 38690000,
+                            anh: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-18-pro-01.jpg",
+                            moTa: `Màn hình: OLED Super Retina XDR 6,3 inch, ProMotion 120Hz, độ sáng tối đa 3.000 nit, hỗ trợ HDR10 và Dolby Vision.
+                                    
+                                Hiệu năng: Chip A20 Pro tiến trình 2nm, GPU 7 lõi, hỗ trợ AI.
+                                    
+                                Camera: Bộ 3 camera sau 48MP, zoom quang học 4x, quay video 4K Dolby Vision 120 fps; camera trước 18MP.
+                                    
+                                Pin và sạc: Xem video đến 34 giờ, sạc 50% trong khoảng 15 phút.
+                                    
+                                Thiết kế: Khung nhôm nguyên khối, Ceramic Shield 2, kháng nước IP68, trọng lượng 211g.
+                                    
+                                Kết nối và tính năng: 5G, Wi-Fi 7, Bluetooth 6, Face ID, Apple Intelligence hỗ trợ tiếng Việt.`,
+                            soLuongTon: 5
+                        },
+                        {
+                            id: 2,
+                            ten: "Chuột LogitechMáy tính bảng Samsung Galaxy Tab S11 WiFi50000",
+                            gia: 16980000,
+                            anh: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-samsung-galaxy-tab-s11_2.jpg",
+                            moTa: ` Hiệu suất mạnh mẽ với chip MediaTek Dimensity 9400+ và RAM 12GB xử lý mượt mọi tác vụ học tập và văn phòng
+                                    
+                                    Màn hình Dynamic AMOLED 2X 11 inch 120Hz hiển thị sắc nét sống động hỗ trợ Vision Booster chống chói hiệu quả
+                                    
+                                    Pin dung lượng 8400mAh hỗ trợ sạc nhanh cho thời gian sử dụng dài liên tục suốt cả ngày
+                                    
+                                    Hỗ trợ Wi-Fi 6E Bluetooth 5.4 và cổng USB-C đảm bảo kết nối nhanh ổn định với nhiều thiết bị
+                                    
+                                    Hỗ trợ bút S Pen thế hệ mới giúp ghi chú sáng tạo và vẽ phác thảo chính xác thuận tiện`,
+                            soLuongTon: 0
+                        },
+                        {
+                            id: 3,
+                            ten: "Đồng hồ thông minh HUAWEI WATCH GT7 41mm",
+                            gia: 4790000,
+                            anh: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/r/product-01_11.png",
+                            moTa: `Thiết kế nhỏ gọn thời trang với vỏ thép không gỉ cao cấp, kết hợp màn hình 1.32" AMOLED siêu sáng 3000 nits hiển thị sắc nét rực rỡ.
+                                    
+                                    Hệ thống cảm biến đa năng tích hợp cùng chuẩn định vị GNSS đa băng tần cao cấp, hỗ trợ theo dõi sức khỏe và theo dõi luyện tập toàn diện, chính xác.
+                                    
+                                    Kháng nước vượt trội đạt chuẩn 5 ATM & IP69, hỗ trợ nghe gọi Bluetooth cùng thời lượng pin bền bỉ lên đến 14 ngày sử dụng.
+                                    
+                                    Lựa chọn đồng hồ thông minh mỏng nhẹ lý tưởng cho phái đẹp và người dùng có cổ tay nhỏ tìm kiếm sự tinh tế cùng công nghệ hiện đại.`,
+                            soLuongTon: 2
+                        },
+                        {
+                            id: 4,
+                            ten: "Robot hút bụi lau nhà tự động làm sạch Dreame L10S Ultra Heat",
+                            gia: 17490000,
+                            anh: "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/r/o/robot-hut-bui-lau-nha-tu-dong-lam-sach-dreame-l10s-ultra-heat-1.jpg",
+                            moTa: `Lực hút Vormax 5.300Pa kết hợp lau xoay kép DuoScrub, làm sạch hiệu quả cả bụi mịn và vết bẩn cứng đầu.
+                                    
+                                    Trạm sạc tự động giặt giẻ nước nóng, sấy khô, đổ rác và cấp nước, vận hành gần như hoàn toàn tự động.
+                                    
+                                    Công nghệ MopExtend RoboSwing giúp giẻ lau vươn sát mép tường và góc khuất, tăng hiệu quả làm sạch.
+                                    
+                                    Điều hướng LiDAR + AI, lập bản đồ 3D và tự động tối ưu lộ trình, hỗ trợ điều khiển qua ứng dụng tiện lợi`,
+                            soLuongTon: 0
+                        }
+                    ]
+                };
+            }
+        });
+
+        // Đăng ký component trước khi mount
+        app.component("the-san-pham", TheSanPham);
+
+        app.mount("#app");
+    </script>
+</body>
+</html>

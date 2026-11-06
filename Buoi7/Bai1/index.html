@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <h2>QUẢN LÝ SẢN PHẨM</h2>
+
+        <p>Trạng thái trang: {{ pageStatus }}</p>
+
+        <div>
+            <label>Tìm kiếm theo tên:</label>
+            <input
+                type="text"
+                v-model="keyword"
+                placeholder="Nhập tên sản phẩm"
+            >
+            <p v-if="searchMessage">{{ searchMessage }}</p>
+        </div>
+
+        <div>
+            <label>Danh mục:</label>
+            <select v-model="selectedCategory">
+                <option value="">Tất cả </option>
+                <option
+                    v-for="category in categories"
+                    :key="category"
+                    :value="category"
+                >
+                    {{ category }}
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label>Sắp xếp theo giá:</label>
+            <select v-model="sortOrder">
+                <option value="">Mặc định</option>
+                <option value="asc">Tăng dần</option>
+                <option value="desc">Giảm dần</option>
+            </select>
+        </div>
+
+        <h3>Thêm sản phẩm</h3>
+
+        <div>
+            <input
+                type="text"
+                v-model="newProduct.name"
+                placeholder="Tên sản phẩm"
+            >
+
+            <input
+                type="number"
+                v-model.number="newProduct.price"
+                placeholder="Giá"
+            >
+
+            <select v-model="newProduct.category">
+                <option value="">Chọn danh mục</option>
+                <option
+                    v-for="category in categories"
+                    :key="category"
+                    :value="category"
+                >
+                    {{ category }}
+                </option>
+            </select>
+
+            <input
+                type="number"
+                v-model.number="newProduct.stock"
+                placeholder="Số lượng còn lại"
+            >
+
+            <button @click="addProduct">Thêm</button>
+        </div>
+
+        <p v-if="errorMessage" class="error">
+            {{ errorMessage }}
+        </p>
+
+        <!-- Bảng sản phẩm -->
+        <h3>Danh sách sản phẩm</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Danh mục</th>
+                    <th>Tồn kho</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr v-for="product in filteredProducts" :key="product.id">
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ formatPrice(product.price) }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        <span
+                            v-if="product.stock > 0"
+                            class="in-stock"
+                        >
+                            Còn hàng
+                        </span>
+                        <span v-else class="out-stock">
+                            Hết hàng
+                        </span>
+                    </td>
+                    <td>
+                        <button @click="deleteProduct(product.id)">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+
+                <tr v-if="filteredProducts.length === 0">
+                    <td colspan="7">
+                        Không có sản phẩm phù hợp.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Thống kê</h3>
+
+        <p>
+            Số sản phẩm đang hiển thị:
+            {{ filteredProducts.length }} / {{ products.length }}
+        </p>
+
+        <p>
+            Tổng giá trị tồn kho:
+            {{ formatPrice(totalInventoryValue) }}
+        </p>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

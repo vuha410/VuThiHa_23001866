@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <h2>GIỎ HÀNG</h2>
+
+        <table v-if="cart.length > 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr
+                    v-for="item in cart"
+                    :key="item.id"
+                    is="vue:dong-gio-hang"
+                    :item="item"
+                    @doi-so-luong="updateQuantity"
+                    @yeu-cau-xoa="deleteItem"
+                ></tr>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="3">
+                        <strong>Tổng cộng</strong>
+                    </td>
+
+                    <td>
+                        <strong>{{ totalQuantity }}</strong>
+                    </td>
+
+                    <td colspan="2">
+                        <strong>{{ formatPrice(totalPrice) }}</strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <p v-else class="empty">
+            Giỏ hàng trống
+        </p>
+    </div>
+
+    <!-- Nạp Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Nạp component -->
+    <script src="components/DongGioHang.js"></script>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    cart: [
+                        {
+                            id: 1,
+                            ten: "Bút",
+                            donGia: 5000,
+                            soLuong: 2
+                        },
+                        {
+                            id: 2,
+                            ten: "Quyển vở",
+                            donGia: 12000,
+                            soLuong: 3
+                        }
+                    ]
+                };
+            },
+
+            computed: {
+                // Tổng số lượng sản phẩm
+                totalQuantity() {
+                    return this.cart.reduce(
+                        (total, item) => total + item.soLuong,
+                        0
+                    );
+                },
+
+                // Tổng tiền giỏ hàng
+                totalPrice() {
+                    return this.cart.reduce(
+                        (total, item) => {
+                            return total + item.donGia * item.soLuong;
+                        },
+                        0
+                    );
+                }
+            },
+
+            methods: {
+                // Cập nhật số lượng sản phẩm
+                updateQuantity(id, newQuantity) {
+                    if (
+                        !Number.isInteger(newQuantity) ||
+                        newQuantity < 1 ||
+                        newQuantity > 99
+                    ) {
+                        return;
+                    }
+
+                    const item = this.cart.find(
+                        item => item.id === id
+                    );
+
+                    if (item) {
+                        item.soLuong = newQuantity;
+                    }
+                },
+
+                // Xóa sản phẩm
+                deleteItem(id) {
+                    this.cart = this.cart.filter(
+                        item => item.id !== id
+                    );
+                },
+
+                // Định dạng giá tiền
+                formatPrice(price) {
+                    return price.toLocaleString("vi-VN") + " đồng";
+                }
+            }
+        });
+
+        // Đăng ký component trước khi mount
+        app.component("dong-gio-hang", DongGioHang);
+
+        // Khởi chạy ứng dụng
+        app.mount("#app");
+    </script>
+
+</body>
+</html>
