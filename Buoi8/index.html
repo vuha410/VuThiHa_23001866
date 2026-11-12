@@ -1,0 +1,753 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý sản phẩm</title>
+
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #fff0f5, #f1edff, #fff8ec);
+            color: #55465e;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 25px;
+            box-shadow: 0 10px 35px rgba(177, 139, 190, 0.15);
+        }
+
+        /* TIÊU ĐỀ */
+
+        h2 {
+            text-align: center;
+            color: #bd79a5;
+            font-size: 30px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        h2::before {
+            content: "🌷 ";
+        }
+
+        h2::after {
+            content: " 🌷";
+        }
+
+        h3 {
+            color: #9672aa;
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 18px;
+        }
+
+        .form-title {
+            border-bottom: 2px dashed #e9c5dd;
+            padding-bottom: 12px;
+        }
+
+        /* BẢNG SẢN PHẨM */
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #dcb8e7;
+            color: #654a72;
+            padding: 15px 10px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 14px 10px;
+            text-align: center;
+            border-bottom: 1px solid #f3e7f2;
+        }
+
+        tbody tr {
+            background: #fff;
+            transition: 0.2s;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fff8fc;
+        }
+
+        tbody tr:hover {
+            background: #f9edff;
+        }
+
+        .stock-empty {
+            color: #e8799b;
+            font-weight: bold;
+        }
+
+        /* FORM */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-weight: 600;
+            color: #866b91;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid #f0ddeb;
+            border-radius: 12px;
+            background: #fffafd;
+            font-size: 15px;
+            color: #55465e;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #d69ac8;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(214, 154, 200, 0.12);
+        }
+
+        input::placeholder {
+            color: #c7b4c8;
+        }
+
+        /* BUTTON */
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 11px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+            margin: 3px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.97);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #e8a8cd, #d5a5e8);
+            color: white;
+            padding: 12px 28px;
+            font-size: 15px;
+        }
+
+        .btn-edit {
+            background: #fce4ae;
+            color: #966d32;
+        }
+
+        .btn-delete {
+            background: #ffd9df;
+            color: #c45d78;
+        }
+
+        .btn-cancel {
+            background: #e9e0f3;
+            color: #826b99;
+        }
+
+        /* THÔNG BÁO */
+
+        .message {
+            padding: 14px 18px;
+            margin: 18px 0;
+            border-radius: 13px;
+            background: #e5f7ec;
+            color: #438664;
+            border: 1px solid #c9ebd6;
+        }
+
+        .error {
+            background: #fff0f1;
+            color: #c65d76;
+            border-color: #f8d0d9;
+        }
+
+        /* TRẠNG THÁI */
+
+        .empty {
+            padding: 25px;
+            color: #b69bbd;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #b080b9;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 650px) {
+            body {
+                padding: 15px 8px;
+            }
+
+            .container {
+                padding: 18px 12px;
+                overflow-x: auto;
+            }
+
+            h2 {
+                font-size: 23px;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <div class="container">
+
+        <h2>QUẢN LÝ SẢN PHẨM</h2>
+
+        <!-- THÔNG BÁO -->
+        <div
+            v-if="message"
+            class="message"
+            :class="{ error: isError }"
+        >
+            {{ message }}
+        </div>
+
+        <!-- DANH SÁCH SẢN PHẨM -->
+        <h3>Danh sách sản phẩm</h3>
+
+        <div v-if="isLoading" class="loading">
+            Đang tải dữ liệu...
+        </div>
+
+        <table v-else>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng tồn</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr
+                    v-for="product in products"
+                    :key="product.id"
+                >
+                    <td>{{ product.id }}</td>
+
+                    <td>{{ product.name }}</td>
+
+                    <td>
+                        {{ formatPrice(product.price) }}
+                    </td>
+
+                    <td :class="{ 'stock-empty': Number(product.stock) === 0 }">
+                        {{ product.stock }}
+                    </td>
+
+                    <td>
+                        <button
+                            class="btn-edit"
+                            @click="editProduct(product)"
+                        >
+                            Sửa
+                        </button>
+
+                        <button
+                            class="btn-delete"
+                            @click="deleteProduct(product.id)"
+                            :disabled="isSaving"
+                        >
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+
+                <tr v-if="products.length === 0">
+                    <td colspan="5" class="empty">
+                        Chưa có sản phẩm
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        <!-- FORM THÊM / SỬA -->
+        <h3 class="form-title">
+            {{ isEditing ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới' }}
+        </h3>
+
+        <form @submit.prevent="saveProduct">
+
+            <!-- TÊN SẢN PHẨM -->
+            <div class="form-group">
+
+                <label>Tên sản phẩm</label>
+
+                <input
+                    type="text"
+                    v-model="form.name"
+                    maxlength="100"
+                    placeholder="Nhập tên sản phẩm"
+                    required
+                >
+
+            </div>
+
+            <!-- ĐƠN GIÁ -->
+            <div class="form-group">
+
+                <label>Đơn giá (đồng)</label>
+
+                <input
+                    type="number"
+                    v-model="form.price"
+                    min="1"
+                    step="1"
+                    placeholder="Nhập đơn giá"
+                    required
+                >
+
+            </div>
+
+            <!-- SỐ LƯỢNG TỒN -->
+            <div class="form-group">
+
+                <label>Số lượng tồn</label>
+
+                <input
+                    type="number"
+                    v-model="form.stock"
+                    min="0"
+                    step="1"
+                    placeholder="Nhập số lượng tồn"
+                    required
+                >
+
+            </div>
+
+            <!-- NÚT LƯU -->
+            <button
+                type="submit"
+                class="btn-save"
+                :disabled="isSaving"
+            >
+                {{ isSaving ? 'Đang xử lý...' : (isEditing ? 'Cập nhật' : 'Lưu') }}
+            </button>
+
+            <!-- NÚT HỦY -->
+            <button
+                v-if="isEditing"
+                type="button"
+                class="btn-cancel"
+                @click="resetForm"
+            >
+                Hủy sửa
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+const { createApp } = Vue;
+
+createApp({
+
+    // DATA
+
+    data() {
+        return {
+
+            apiUrl: "/Web/Buoi8/api/products.php",
+
+            // Danh sách sản phẩm
+            products: [],
+
+            // Dữ liệu form
+            form: {
+                name: "",
+                price: "",
+                stock: ""
+            },
+
+            // Trạng thái thêm / sửa
+            isEditing: false,
+            editingId: null,
+
+            // Thông báo
+            message: "",
+            isError: false,
+
+            // Trạng thái tải và lưu
+            isLoading: false,
+            isSaving: false
+
+        };
+    },
+
+    methods: {
+
+        // HIỂN THỊ THÔNG BÁO
+        showMessage(message, error = false) {
+
+            this.message = message;
+            this.isError = error;
+
+        },
+
+        // ĐỊNH DẠNG GIÁ TIỀN
+        formatPrice(price) {
+
+            return Number(price).toLocaleString("vi-VN") + " đ";
+
+        },
+
+        // XỬ LÝ PHẢN HỒI API
+        async readResponse(response) {
+
+            const text = await response.text();
+
+            let result;
+
+            try {
+
+                result = JSON.parse(text);
+
+            } catch (error) {
+
+                console.error("API trả về không phải JSON:", text);
+
+                throw new Error(
+                    "API không trả về JSON. Hãy kiểm tra đường dẫn hoặc lỗi PHP."
+                );
+
+            }
+
+            if (!response.ok || !result.success) {
+
+                throw new Error(
+                    result.message || "Có lỗi xảy ra khi gọi API"
+                );
+
+            }
+
+            return result;
+
+        },
+
+        // GET - LẤY DANH SÁCH SẢN PHẨM
+
+        async loadProducts() {
+
+            this.isLoading = true;
+
+            try {
+
+                const response = await fetch(this.apiUrl);
+
+                const result = await this.readResponse(response);
+
+                this.products = result.data;
+
+            } catch (error) {
+
+                this.showMessage(error.message, true);
+
+            } finally {
+
+                this.isLoading = false;
+
+            }
+
+        },
+
+        // =========================
+        // POST / PUT: THÊM VÀ SỬA
+        // =========================
+
+        async saveProduct() {
+
+            const name = this.form.name.trim();
+
+            const price = Number(this.form.price);
+
+            const stock = Number(this.form.stock);
+
+            // Kiểm tra tên
+            if (name.length < 1 || name.length > 100) {
+
+                this.showMessage(
+                    "Tên sản phẩm phải từ 1 đến 100 ký tự",
+                    true
+                );
+
+                return;
+
+            }
+
+            // Kiểm tra giá
+            if (
+                this.form.price === "" ||
+                !Number.isSafeInteger(price) ||
+                price <= 0
+            ) {
+
+                this.showMessage(
+                    "Đơn giá phải là số nguyên lớn hơn 0",
+                    true
+                );
+
+                return;
+
+            }
+
+            // Kiểm tra tồn kho
+            if (
+                this.form.stock === "" ||
+                !Number.isSafeInteger(stock) ||
+                stock < 0
+            ) {
+
+                this.showMessage(
+                    "Số lượng tồn phải là số nguyên không âm",
+                    true
+                );
+
+                return;
+
+            }
+
+            const data = {
+                name: name,
+                price: price,
+                stock: stock
+            };
+
+            try {
+
+                this.isSaving = true;
+
+                let url = this.apiUrl;
+
+                let method = "POST";
+
+                // Nếu đang sửa thì dùng PUT
+                if (this.isEditing) {
+
+                    url += "?id=" + this.editingId;
+
+                    method = "PUT";
+
+                }
+
+                const response = await fetch(url, {
+
+                    method: method,
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(data)
+
+                });
+
+                const result = await this.readResponse(response);
+
+                this.showMessage(result.message);
+
+                // Reset form
+                this.resetForm();
+
+                // Cập nhật bảng
+                await this.loadProducts();
+
+            } catch (error) {
+
+                this.showMessage(error.message, true);
+
+            } finally {
+
+                this.isSaving = false;
+
+            }
+
+        },
+
+        // sửa sản phẩm
+
+        editProduct(product) {
+
+            this.isEditing = true;
+
+            this.editingId = Number(product.id);
+
+            this.form = {
+
+                name: product.name,
+
+                price: Number(product.price),
+
+                stock: Number(product.stock)
+
+            };
+
+            this.showMessage(
+                "Đang chỉnh sửa sản phẩm: " + product.name
+            );
+
+            // Cuộn lên form
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
+
+        },
+
+        // =========================
+        // DELETE: XÓA SẢN PHẨM
+        // =========================
+
+        async deleteProduct(id) {
+
+            const confirmDelete = confirm(
+                "Bạn có chắc chắn muốn xóa sản phẩm này không?"
+            );
+
+            if (!confirmDelete) {
+
+                return;
+
+            }
+
+            try {
+
+                this.isSaving = true;
+
+                const response = await fetch(
+                    this.apiUrl + "?id=" + id,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+                const result = await this.readResponse(response);
+
+                this.showMessage(result.message);
+
+                // Nếu đang sửa sản phẩm vừa xóa
+                if (Number(this.editingId) === Number(id)) {
+
+                    this.resetForm();
+
+                }
+
+                // Cập nhật danh sách
+                await this.loadProducts();
+
+            } catch (error) {
+
+                this.showMessage(error.message, true);
+
+            } finally {
+
+                this.isSaving = false;
+
+            }
+
+        },
+
+        // =========================
+        // RESET FORM
+        // =========================
+
+        resetForm() {
+
+            this.form = {
+
+                name: "",
+
+                price: "",
+
+                stock: ""
+
+            };
+
+            this.isEditing = false;
+
+            this.editingId = null;
+
+        }
+
+    },
+
+    mounted() {
+
+        this.loadProducts();
+
+    }
+
+}).mount("#app");
+
+</script>
+
+</body>
+</html>
